@@ -166,6 +166,7 @@ static bool is_simulation_done(counter_t sim_insn) {
  * 	None
  */
 void CDB_To_retire(int current_cycle) {
+  if (commonDataBus == NULL) return;
   /* checks all RS and and map table and clears any entry that corresponds to be
    * current cdb*/
   /* checks map table clears if it is the same as the common data bus */
@@ -195,7 +196,7 @@ void CDB_To_retire(int current_cycle) {
     }
   }
 
-  commonDataBus = NULL;
+  // commonDataBus = NULL; // pointX
   return;
 }
 
@@ -267,9 +268,9 @@ void execute_To_CDB(int current_cycle) {
   }
 
   /* skip if CDB is not available */
-  if (commonDataBus != NULL) {
-    return;
-  }
+  // if (commonDataBus != NULL) {  // pointY
+  //   return;                     // pointY
+  // }                             // pointY
 
   /* clears RS and FU entry */
   for (int i = 0; i < FU_FP_SIZE; i++) {
