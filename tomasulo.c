@@ -79,7 +79,7 @@
 // instruction queue for tomasulo
 static instruction_t* instr_queue[INSTR_QUEUE_SIZE];
 // number of instructions in the instruction queue
-static int instr_queue_size = 0;
+static int instr_queue_size = 1;
 
 /* ECE552 Assignment 3 - BEGIN  CODE */
 
@@ -204,6 +204,7 @@ void CDB_To_retire(int current_cycle) {
     }
   }
 
+  commonDataBus = NULL;
   return;
 }
 
@@ -221,7 +222,7 @@ void execute_To_CDB(int current_cycle) {
   for (int i = 0; i < FU_INT_SIZE; i++) {
     /* if the entry is valid */
     if (fuINT[i] != NULL) {
-      /* if the entry can leave execute in the current cycle */
+      /* if the entry can leave execute by the next cycle */
       if (current_cycle >= fuINT[i]->tom_execute_cycle + FU_INT_LATENCY) {
         /* check if this instruction writes to CBD, if it doesn't clear the
          * entry otherwise take the oldest instruction in FU */
@@ -247,7 +248,7 @@ void execute_To_CDB(int current_cycle) {
   for (int i = 0; i < FU_FP_SIZE; i++) {
     /* if the entry is valid */
     if (fuFP[i] != NULL) {
-      /* if the entry can leave execute in the current cycle */
+      /* if the entry can leave execute by the next cycle */
       if (current_cycle >= fuFP[i]->tom_execute_cycle + FU_FP_LATENCY) {
         /* check if this instruction writes to CBD, if it doesn't clear the
          * entry otherwise take the oldest instruction in FU */
