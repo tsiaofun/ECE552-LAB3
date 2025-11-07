@@ -107,7 +107,7 @@ static instruction_t* map_table[MD_TOTAL_REGS];
 
 // the index of the last instruction fetched
 // Skip the first *0* invalid instruction 
-static int fetch_index = 1;
+static int fetch_index = 0;
 
 // static instruction_t inst_debug;
 // static instruction_t* inst_debug_ptr = &inst_debug;
