@@ -195,6 +195,8 @@ void CDB_To_retire(int current_cycle) {
       }
     }
   }
+  /* set CDB to Null */
+  commonDataBus = NULL;
 
   // commonDataBus = NULL; // pointX
   return;
