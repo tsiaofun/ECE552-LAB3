@@ -106,7 +106,11 @@ static instruction_t* commonDataBus = NULL;
 static instruction_t* map_table[MD_TOTAL_REGS];
 
 // the index of the last instruction fetched
-static int fetch_index = 0;
+// Skip the first *0* invalid instruction 
+static int fetch_index = 1;
+
+// static instruction_t inst_debug;
+// static instruction_t* inst_debug_ptr = &inst_debug;
 
 /* FUNCTIONAL UNITS */
 
@@ -126,7 +130,7 @@ static bool is_simulation_done(counter_t sim_insn) {
   /* the simulation is done if
    * (1) all instructions have been fetched i.e. fetch index >= sim_insn
    * (2) and no more instructions are in the pipeline */
-  if (fetch_index >= sim_insn) {
+  if (fetch_index > sim_insn) {
     /* checks IFQ */
     if (instr_queue_size != 0) {
       return 0;
@@ -178,6 +182,7 @@ void CDB_To_retire(int current_cycle) {
   /* checks map table clears if it is the same as the common data bus */
   for (int i = 0; i < MD_TOTAL_REGS; i++) {
     if (map_table[i] == commonDataBus) {
+      // PRINT_REG(stdout, i, "CDB_To_retire [MOVE]", map_table[i])
       map_table[i] = NULL;
     }
   }
@@ -277,25 +282,21 @@ void execute_To_CDB(int current_cycle) {
   for (int i = 0; i < FU_FP_SIZE; i++) {
     if (fuFP[i] == e_instr) {
       fuFP[i] = NULL;
-      continue;
     }
   }
   for (int i = 0; i < FU_INT_SIZE; i++) {
     if (fuINT[i] == e_instr) {
       fuINT[i] = NULL;
-      continue;
     }
   }
   for (int i = 0; i < RESERV_FP_SIZE; i++) {
     if (reservFP[i] == e_instr) {
       reservFP[i] = NULL;
-      continue;
     }
   }
   for (int i = 0; i < RESERV_INT_SIZE; i++) {
     if (reservINT[i] == e_instr) {
       reservINT[i] = NULL;
-      continue;
     }
   }
   /* move the entry into CDB */
@@ -364,6 +365,7 @@ void issue_To_execute(int current_cycle) {
       }
       /* if an instruction is selected */
       if (i_instr != NULL) {
+        // PRINT_INST(stdout, i_instr, "issue_To_execute", current_cycle);
         /* move instruction into functional unit */
         fuINT[fu_i] = i_instr;
         /* set the cycle */
@@ -371,6 +373,8 @@ void issue_To_execute(int current_cycle) {
         /* reset i_instr */
         i_instr = NULL;
       }
+    } else {
+      // PRINT_INST(stdout, fuINT[fu_i], "fuINT", current_cycle);
     }
   }
   /* check Float FUs */
@@ -394,6 +398,7 @@ void issue_To_execute(int current_cycle) {
       }
       /* if an instruction is selected */
       if (i_instr != NULL) {
+        // PRINT_INST(stdout, i_instr, "issue_To_execute", current_cycle);
         /* move instruction into functional unit */
         fuFP[fu_i] = i_instr;
         /* set the cycle */
@@ -460,6 +465,7 @@ void dispatch_To_issue(int current_cycle) {
     /* do nothing if CTRL */
   }
 
+  // PRINT_INST(stdout, d_instr, "dispatch_To_issue", current_cycle);
   /* set cycle the intruction enters dispatch */
   d_instr->tom_issue_cycle = current_cycle;
   /* populate the Q array with values, if NULL -> value available in register
@@ -509,7 +515,7 @@ void fetch(instruction_trace_t* trace) {
 
   /* Checks if the queue is full if it is bypass fetch/stall until the queue
    * has space*/
-  if (instr_queue_size == INSTR_QUEUE_SIZE || fetch_index >= sim_num_insn) {
+  if (instr_queue_size == INSTR_QUEUE_SIZE || fetch_index > sim_num_insn) {
     return;
   }
 
@@ -526,6 +532,8 @@ void fetch(instruction_trace_t* trace) {
       instr_queue[instr_queue_tail]->tom_dispatch_cycle = -1;
       instr_queue[instr_queue_tail]->tom_execute_cycle = -1;
       instr_queue[instr_queue_tail]->tom_issue_cycle = -1;
+
+      // PRINT_INST(stdout, instr_queue[instr_queue_tail], "fetch_To_dispatch", current_cycle);
 
       // Update the instruction queue size
       instr_queue_size++;
