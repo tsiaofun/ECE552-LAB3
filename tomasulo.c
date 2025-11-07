@@ -106,7 +106,7 @@ static instruction_t* commonDataBus = NULL;
 static instruction_t* map_table[MD_TOTAL_REGS];
 
 // the index of the last instruction fetched
-// Skip the first *0* invalid instruction 
+// Skip the first *0* invalid instruction
 static int fetch_index = 0;
 
 // static instruction_t inst_debug;
@@ -130,7 +130,7 @@ static bool is_simulation_done(counter_t sim_insn) {
   /* the simulation is done if
    * (1) all instructions have been fetched i.e. fetch index >= sim_insn
    * (2) and no more instructions are in the pipeline */
-  if (fetch_index > sim_insn) {
+  if (fetch_index >= sim_insn) {
     /* checks IFQ */
     if (instr_queue_size != 0) {
       return 0;
@@ -515,7 +515,7 @@ void fetch(instruction_trace_t* trace) {
 
   /* Checks if the queue is full if it is bypass fetch/stall until the queue
    * has space*/
-  if (instr_queue_size == INSTR_QUEUE_SIZE || fetch_index > sim_num_insn) {
+  if (instr_queue_size == INSTR_QUEUE_SIZE) {
     return;
   }
 
@@ -533,7 +533,8 @@ void fetch(instruction_trace_t* trace) {
       instr_queue[instr_queue_tail]->tom_execute_cycle = -1;
       instr_queue[instr_queue_tail]->tom_issue_cycle = -1;
 
-      // PRINT_INST(stdout, instr_queue[instr_queue_tail], "fetch_To_dispatch", current_cycle);
+      // PRINT_INST(stdout, instr_queue[instr_queue_tail], "fetch_To_dispatch",
+      // current_cycle);
 
       // Update the instruction queue size
       instr_queue_size++;
