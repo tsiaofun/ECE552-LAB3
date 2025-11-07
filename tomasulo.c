@@ -171,6 +171,10 @@ void CDB_To_retire(int current_cycle) {
   /* ECE552 Assignment 3 - BEGIN  CODE */
   /* checks all RS and and map table and clears any entry that corresponds to be
    * current cdb*/
+  /* bypass if NULL */
+  if (commonDataBus == NULL) {
+    return;
+  }
   int i = 0;
   int q_i = 0;
   /* checks map table clears if it is the same as the common data bus */
@@ -199,6 +203,8 @@ void CDB_To_retire(int current_cycle) {
       }
     }
   }
+  /* set CDB to Null */
+  commonDataBus = NULL;
 
   return;
   /* ECE552 Assignment 3 - END CODE */
@@ -512,7 +518,7 @@ void fetch(instruction_trace_t* trace) {
     fetch_index++;
     // if not a trap add to queue and return
     if (!IS_TRAP(instr_queue[instr_queue_tail]->op)) {
-      /* initialses the tom cycle tracker */
+      /* initialises the tom cycle tracker */
       instr_queue[instr_queue_tail]->tom_cdb_cycle = -1;
       instr_queue[instr_queue_tail]->tom_dispatch_cycle = -1;
       instr_queue[instr_queue_tail]->tom_execute_cycle = -1;
